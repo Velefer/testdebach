@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Test de emociones para Terapia con Flores de Bach</title>
+  <style>
+    :root {
+      --bg: #f8fafc; /* slate-50 */
+      --card: #ffffff;
+      --ink: #0f172a; /* slate-900 */
+      --muted: #475569; /* slate-600 */
+      --brand: #2563eb; /* blue-600 */
+      --ok: #16a34a; /* green-600 */
+      --warn: #ea580c; /* orange-600 */
+      --highlight-bg: #e0e7ff; /* blue-200 */
+    }
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, "Apple Color Emoji", "Segoe UI Emoji"; margin: 0; background: var(--bg); color: var(--ink); }
+    header { position: sticky; top: 0; z-index: 10; background: var(--card); border-bottom: 1px solid #e2e8f0; padding: 14px 16px; }
+    h1 { margin: 0; font-size: 20px; }
+    main { max-width: 1000px; margin: 0 auto; padding: 16px; }
+    .toolbar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0 16px; }
+    .btn { border: 1px solid #cbd5e1; background: #fff; color: var(--ink); padding: 8px 12px; border-radius: 10px; cursor: pointer; }
+    .btn.primary { background: var(--brand); color: #fff; border-color: var(--brand); }
+    .btn.ghost { background: transparent; }
+    .grid { display: grid; grid-template-columns: repeat( auto-fit, minmax(280px, 1fr) ); gap: 12px; }
+    .card { background: var(--card); border: 1px solid #e2e8f0; border-radius: 14px; padding: 14px; box-shadow: 0 1px 2px rgba(0,0,0,0.03); }
+    .card h3 { margin: 0 0 4px; font-size: 16px; }
+    .desc { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+    .q { font-size: 14px; margin: 8px 0; }
+    .options { display: inline-flex; gap: 8px; margin-top: 6px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 12px; border: 1px solid #e2e8f0; color: var(--muted); }
+    .results { margin-top: 18px; }
+    .results h2 { margin-top: 20px; }
+    details { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 12px; }
+    summary { cursor: pointer; font-weight: 600; }
+    .list { padding-left: 18px; }
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+    .muted { color: var(--muted); }
+    footer { text-align: center; font-size: 12px; color: var(--muted); padding: 24px; }
+    .section-title {
+        grid-column: 1 / -1;
+        margin-top: 24px;
+        margin-bottom: 8px;
+        font-size: 18px;
+        color: var(--brand);
+        border-bottom: 2px solid var(--brand);
+        padding-bottom: 4px;
+    }
+    .patient-info {
+        display: grid;
+        gap: 12px;
+        margin-bottom: 24px;
+        grid-template-columns: 1fr;
+    }
+    .patient-info .field {
+        display: flex;
+        flex-direction: column;
+    }
+    .patient-info .field input, .patient-info .field textarea {
+        padding: 8px 10px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-top: 4px;
+    }
+    .patient-info .field textarea {
+        min-height: 80px;
+        resize: vertical;
+    }
+    .patient-instructions {
+      background: var(--card);
+      border: 1px solid #e2e8f0;
+      padding: 18px;
+      border-radius: 12px;
+      margin-top: 24px;
+      line-height: 1.5;
+    }
+    .patient-instructions .warning {
+      font-size: 14px;
+      padding: 12px;
+      background: #fef2f2;
+      border: 1px solid #fee2e2;
+      border-radius: 8px;
+      margin-top: 12px;
+      color: #b91c1c;
+    }
+    .patient-instructions .info-box {
+        background: #f1f5f9;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 16px;
+        margin-top: 16px;
+    }
+    .patient-instructions ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    .patient-instructions li {
+        margin-bottom: 8px;
+    }
+    .patient-instructions .list-item::before {
+        content: "✨";
+        margin-right: 8px;
+    }
+    @media (min-width: 600px) {
+      .patient-info {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    /* Estilos para impresión */
+    @media print {
+      body { background: white; }
+      header, .toolbar, .q .options, .results details, footer, .patient-info .field input, .patient-info .field textarea, .patient-instructions .btn {
+        display: none;
+      }
+      main {
+        max-width: 100%;
+        padding: 0;
+      }
+      .patient-info, .results { display: block !important; }
+      .patient-info h2 { display: block; }
+      .patient-info .field {
+        display: block !important;
+        margin-bottom: 12px;
+      }
+      .patient-info .field label { font-weight: bold; }
+      .patient-info .field span { display: block; margin-top: 4px; }
+      .q .options { display: none; }
+      .q {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 4px 0;
+      }
+      .q::after {
+        content: attr(data-answer);
+        font-weight: bold;
+        color: var(--brand);
+      }
+      .card { border: none; box-shadow: none; }
+      .results { margin-top: 0; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="patient-info" id="patient-info">
+      <h2>Datos del Paciente</h2>
+      <div class="field">
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" name="nombre" placeholder="Nombre completo">
+      </div>
+      <div class="field">
+        <label for="edad">Edad:</label>
+        <input type="number" id="edad" name="edad" placeholder="Edad">
+      </div>
+      <div class="field">
+        <label for="ocupacion">Ocupación:</label>
+        <input type="text" id="ocupacion" name="ocupacion" placeholder="Ocupación">
+      </div>
+      <div class="field">
+        <label for="fecha">Fecha del encuentro:</label>
+        <input type="date" id="fecha" name="fecha">
+      </div>
+      <div class="field" style="grid-column: 1 / -1;">
+        <label for="motivo">Motivo de la consulta:</label>
+        <textarea id="motivo" name="motivo" placeholder="Describe brevemente el motivo de la consulta..."></textarea>
+      </div>
+    </section>
+
+    <header>
+      <h1>🌸 Test de emociones para Terapia con Flores de Bach</h1>
+    </header>
+    <p class="muted">Marcá <strong>Sí</strong> o <strong>No</strong> en cada pregunta. Luego apretá <em>Ver resultados</em>. El sistema arma una fórmula sugerida (máx. 9 flores), priorizando 3/3, luego 2/3 y por último 1/3.</p>
+
+    <div class="toolbar">
+      <button class="btn primary" id="btnVer">Ver resultados</button>
+      <button class="btn" id="btnReiniciar">Reiniciar</button>
+      <span class="tag" id="progreso">0/117 respondidas</span>
+    </div>
+
+    <section id="form" class="grid"></section>
+
+    <section class="results" id="resultados" hidden>
+      <div class="toolbar">
+        <button class="btn primary" id="btnGuardar">Guardar como PDF</button>
+      </div>
+      <h2>Resultados</h2>
+      <div id="bloqueFormula"></div>
+      <div id="bloqueGrupos"></div>
+      <div id="bloqueDiagnostico"></div>
+      <div id="bloqueRescue"></div>
+      <details style="margin-top:12px"><summary>Ver ranking completo</summary>
+        <div id="bloqueRanking"></div>
+      </details>
+      <div id="bloqueInstrucciones"></div>
+      
+      <details style="margin-top: 24px;">
+        <summary>🌸 Tabla de Flores de Bach y su acción sobre cuerpo-emoción</summary>
+        <p>A continuación, se detalla la posible repercusión física de cada emoción en desequilibrio, según la terapia floral de Bach.</p>
+        
+        <h4>🌟 Rescue Remedy</h4>
+        <ul class="list">
+          <li><strong>Emociones:</strong> shock, trauma, pánico, crisis inmediata.</li>
+          <li><strong>Efecto físico:</strong> estabiliza el sistema nervioso autónomo, regula respiración, frecuencia cardíaca y tensión aguda; ayuda a calmar temblores o espasmos relacionados con la crisis.</li>
+        </ul>
+        
+        <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+            <thead>
+                <tr style="background-color: #e2e8f0;">
+                    <th style="border: 1px solid #cbd5e1; padding: 8px; text-align: left;">Flor</th>
+                    <th style="border: 1px solid #cbd5e1; padding: 8px; text-align: left;">Emoción en desequilibrio</th>
+                    <th style="border: 1px solid #cbd5e1; padding: 8px; text-align: left;">Vibración que transmite</th>
+                    <th style="border: 1px solid #cbd5e1; padding: 8px; text-align: left;">Efecto emocional</th>
+                    <th style="border: 1px solid #cbd5e1; padding: 8px; text-align: left;">Posible impacto físico</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Agrimony</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Oculta sufrimiento tras sonrisa</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Autenticidad</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Expresión genuina</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Mejora digestiva (menos úlceras, colitis nerviosa)</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Aspen</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Miedos vagos, inexplicables</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Seguridad interior</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Confianza ante lo desconocido</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Relaja sistema nervioso (menos insomnio, palpitaciones)</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Beech</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Crítica, intolerancia</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Comprensión</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Tolerancia</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos tensión en mandíbula, cervicales</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Centaury</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Sumisión excesiva</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Autoafirmación</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Saber decir “no”</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Mejora vitalidad (menos cansancio crónico)</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Cerato</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Duda de sí mismo</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Confianza interior</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Seguridad en decisiones</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Reduce ansiedad mental (dolores de cabeza tensionales)</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Cherry Plum</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Miedo a perder control</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Autocontrol sereno</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Calma interna</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos espasmos, mejor regulación del intestino</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Chestnut Bud</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Repite errores</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Aprendizaje consciente</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Atención, memoria</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos accidentes, mejor coordinación</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Chicory</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Apego, manipulación afectiva</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Amor desinteresado</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Generosidad</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Relaja tensión cardíaca y torácica</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Clematis</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Desconexión, evasión</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Presencia</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Atención y enraizamiento</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos mareos, somnolencia</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Crab Apple</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Sensación de impureza</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Purificación</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Aceptación de sí mismo</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Mejora piel, alergias psicosomáticas</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Elm</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Agobio por exceso de responsabilidad</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Confianza en la capacidad</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Seguridad y eficiencia</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos fatiga, equilibrio hormonal</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Gentian</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Desaliento por contratiempos</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Perseverancia</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Confianza realista</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Refuerza sistema inmune</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Gorse</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Desesperanza total</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Esperanza</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Fe y motivación</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Revitaliza cuerpo debilitado</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Heather</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Egocentrismo, necesidad de atención</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Escucha y empatía</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Conexión real</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos tensión digestiva</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Holly</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Celos, odio, resentimiento</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Amor universal</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Apertura afectiva</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Mejora tensión arterial y cardíaca</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Honeysuckle</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Vivir en el pasado</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Presencia</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Suelta nostalgia</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Más energía vital</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Hornbeam</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Fatiga mental</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Energía renovada</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Motivación</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Alivio de cansancio matinal</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Impatiens</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Impaciencia, irritabilidad</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Ritmo natural</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Calma</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos contracturas y taquicardia</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Larch</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Falta de confianza</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Autoestima</td>
+                    <td style="border: 1-px solid #cbd5e1; padding: 8px;">Valor en acción</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Mejora postura corporal, respiración</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Mimulus</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Miedos concretos</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Coraje tranquilo</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Seguridad en lo cotidiano</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos tensión muscular y digestiva</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Mustard</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Tristeza sin causa</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Luz interior</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Claridad, alegría</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Aligera pesadez corporal, mejora sueño</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Oak</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Luchador incansable</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Flexibilidad</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Descanso interior</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Reduce agotamiento crónico</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Olive</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Agotamiento extremo</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Renovación vital</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Energía recuperada</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Refuerza sistema inmune y hormonal</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Pine</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Culpa</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Perdón interior</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Autoaceptación</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos opresión torácica</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Red Chestnut</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Preocupación excesiva por otros</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Confianza en destino del otro</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Libertad emocional</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos ansiedad somática</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Rock Rose</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Terror, pánico</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Valentía</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Serenidad en crisis</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Calma sistema nervioso autónomo</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Rock Water</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Rigidez</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Flexibilidad</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Disfrute de la vida</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos rigidez muscular y articular</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Scleranthus</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Indecisión interna</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Equilibrio</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Decisión y estabilidad</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos mareos, vértigos</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Star of Bethlehem</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Shock, trauma</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Consuelo</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Integración de la herida</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Libera bloqueos somáticos</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Sweet Chestnut</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Desesperación extrema</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Luz en la oscuridad</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Esperanza</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Revitaliza organismo exhausto</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Vervain</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Exceso de entusiasmo</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Moderación</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Serenidad y calma</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos hipertensión y contracturas</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Vine</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Autoritarismo</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Liderazgo positivo</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Humildad y guía justa</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos rigidez cervical</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Walnut</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Vulnerabilidad a influencias</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Adaptación</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Seguridad en cambios</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos alergias y reacciones cutáneas</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Water Violet</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Orgullo, aislamiento</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Humildad</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Conexión serena</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Mejora circulación, libera tensión</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">White Chestnut</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Pensamientos repetitivos</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Paz mental</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Silencio interior</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos insomnio y cefaleas</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Wild Oat</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Falta de rumbo vital</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Claridad vocacional</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Dirección</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Más vitalidad corporal</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Wild Rose</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Resignación, apatía</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Interés en la vida</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Alegría y motivación</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Revitaliza sistema inmune</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Willow</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Resentimiento, victimismo</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Aceptación</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Responsabilidad personal</td>
+                    <td style="border: 1px solid #cbd5e1; padding: 8px;">Menos dolor crónico psicosomático</td>
+                </tr>
+            </tbody>
+        </table>
+      </details>
+    </section>
+
+    <footer>Hecho para Vero — uso terapéutico, no reemplaza diagnóstico médico.</footer>
+  </main>
+
+<script>
+// === Base completa (38 flores + Rescue) organizada por conjuntos de emociones ===
+const flowers = [
+  // Grupo 1: Miedo
+  { name: "Aspen", emotion: "miedos vagos y presentimientos", use: "Para temores difusos, ansiedad sin causa clara y presentimientos.", questions: [
+    "¿Tenés miedos o presentimientos sin poder decir exactamente a qué?",
+    "¿Te invade ansiedad sin motivo claro?",
+    "¿Te inquietan sensaciones 'extrañas' difíciles de explicar?",
+  ], physical: "taquicardia, sudoración, tensiones musculares, insomnio.", vibration: "Seguridad interior", effect: "Confianza ante lo desconocido"},
+  { name: "Cherry Plum", emotion: "miedo a perder el control", use: "Para temor a desbordarse, impulsos o pensamientos que asustan.", questions: [
+    "¿Temés perder el control y hacer algo de lo que te arrepientas?",
+    "¿Te aparecen impulsos o pensamientos que te asustan?",
+    "¿Tenés miedo a 'desbordarte' en discusiones o crisis?",
+  ], physical: "espasmos musculares, tensión digestiva, insomnio.", vibration: "Autocontrol sereno", effect: "Calma interna"},
+  { name: "Mimulus", emotion: "miedos concretos", use: "Para miedos conocidos (fobias, hablar en público, etc.).", questions: [
+    "¿Sentís miedo a cosas concretas o conocidas?",
+    "¿Evitás situaciones por temor a que algo salga mal?",
+    "¿Tus miedos te limitan en la vida cotidiana?",
+  ], physical: "tensión muscular, problemas digestivos, insomnio.", vibration: "Coraje tranquilo", effect: "Seguridad en lo cotidiano"},
+  { name: "Red Chestnut", emotion: "preocupación por seres queridos", use: "Para soltar el miedo exagerado por el bienestar de otros.", questions: [
+    "¿Te preocupás en exceso por tus seres queridos?",
+    "¿Imaginás escenarios negativos que puedan afectarles?",
+    "¿Te cuesta soltar el control cuando no están cerca?",
+  ], physical: "ansiedad somática, tensión muscular, palpitaciones.", vibration: "Confianza en destino del otro", effect: "Libertad emocional"},
+  { name: "Rock Rose", emotion: "pánico y terror", use: "Para miedos extremos y estados de pánico.", questions: [
+    "¿Sufrís terrores intensos o ataques de pánico?",
+    "¿Sentís que perdés el control en crisis?",
+    "¿Tu miedo se acompaña de sensación de parálisis?",
+  ], physical: "taquicardia, temblores, espasmos, shock físico.", vibration: "Valentía", effect: "Serenidad en crisis"},
+
+  // Grupo 2: Incertidumbre
+  { name: "Cerato", emotion: "falta de confianza en el propio juicio", use: "Para confiar en la intuición y dejar de buscar aprobación constante.", questions: [
+    "¿Dudás de tu criterio y buscás consejo todo el tiempo?",
+    "¿Cambiás de decisión si alguien opina distinto?",
+    "¿Te cuesta confiar en tu intuición?",
+  ], physical: "cefaleas, tensión en cuello y hombros, digestión irregular.", vibration: "Confianza interior", effect: "Seguridad en decisiones"},
+  { name: "Gentian", emotion: "desaliento por contratiempos", use: "Para recuperar ánimo y perseverancia ante obstáculos.", questions: [
+    "¿Te desanimás frente a contratiempos?",
+    "¿Tendés a ver el vaso medio vacío?",
+    "¿Abandonás proyectos ante el primer tropiezo?",
+  ], physical: "cansancio, falta de energía, debilitamiento inmunológico.", vibration: "Perseverancia", effect: "Confianza realista"},
+  { name: "Gorse", emotion: "desesperanza", use: "Para quienes sienten que no hay salida ni esperanza.", questions: [
+    "¿Sentís desesperanza y ganas de bajar los brazos?",
+    "¿Decís 'para qué, si no va a funcionar'?",
+    "¿Te cuesta creer que haya salida?",
+  ], physical: "agotamiento físico, debilidad general.", vibration: "Esperanza", effect: "Fe y motivación"},
+  { name: "Hornbeam", emotion: "cansancio mental anticipatorio", use: "Para iniciar con energía cuando aparece la pereza mental del 'lunes eterno'.", questions: [
+    "¿Te levantás cansada/o mentalmente, como si fuera 'lunes eterno'?",
+    "¿Postergás tareas por falta de impulso?",
+    "¿Necesitás estímulos para empezar?",
+  ], physical: "cansancio crónico, somnolencia, debilidad muscular.", vibration: "Energía renovada", effect: "Motivación"},
+  { name: "Scleranthus", emotion: "indecisión y altibajos", use: "Para decidir con equilibrio y estabilidad interna.", questions: [
+    "¿Te cuesta decidir entre dos opciones?",
+    "¿Tenés altibajos de ánimo o energía?",
+    "¿Cambiás de idea con frecuencia?",
+  ], physical: "mareos, fatiga mental, tensión corporal leve.", vibration: "Equilibrio", effect: "Decisión y estabilidad"},
+  { name: "Wild Oat", emotion: "búsqueda de propósito y rumbo", use: "Para clarificar vocación cuando nada termina de satisfacer.", questions: [
+    "¿No tenés claro tu rumbo de vida?",
+    "¿Probás muchas cosas pero nada te satisface?",
+    "¿Buscás un propósito más alineado con vos?",
+  ], physical: "cansancio general, fatiga, apatía física.", vibration: "Claridad vocacional", effect: "Dirección"},
+
+  // Grupo 3: Falta de Interés por el Presente
+  { name: "Clematis", emotion: "ensoñación y desconexión", use: "Para presencia, concreción y conexión con el aquí y ahora.", questions: [
+    "¿Vivís distraída/o, soñando despierta/o?",
+    "¿Te cuesta estar presente y concretar?",
+    "¿Preferís la fantasía al aquí y ahora?",
+  ], physical: "mareos, somnolencia, apatía física.", vibration: "Presencia", effect: "Atención y enraizamiento"},
+  { name: "Honeysuckle", emotion: "nostalgia y apego al pasado", use: "Para soltar el pasado y habitar el presente con gratitud.", questions: [
+    "¿Vivís mirando el pasado con nostalgia?",
+    "¿Te cuesta soltar una etapa o relación pasada?",
+    "¿Comparás todo con 'lo de antes' y el presente pierde valor?",
+  ], physical: "apatía física, cansancio, pérdida de vitalidad.", vibration: "Presencia", effect: "Suelta nostalgia"},
+  { name: "Mustard", emotion: "tristeza súbita sin causa", use: "Para melancolía que aparece y se va sin motivo aparente.", questions: [
+    "¿Te cae una tristeza intensa sin causa clara?",
+    "¿Sentís 'nube negra' pasajera que te tapa la alegría?",
+    "¿La melancolía aparece y desaparece sin explicación?",
+  ], physical: "pesadez corporal, fatiga, cambios de apetito.", vibration: "Luz interior", effect: "Claridad, alegría"},
+  { name: "Olive", emotion: "agotamiento extremo", use: "Para recuperación tras desgaste físico/mental prolongado.", questions: [
+    "¿Estás exhausta/o física y mentalmente?",
+    "¿Cualquier actividad te resulta pesada?",
+    "¿Te cuesta recuperarte después de un esfuerzo?",
+  ], physical: "debilidad general, cansancio profundo, problemas inmunes.", vibration: "Renovación vital", effect: "Energía recuperada"},
+  { name: "White Chestnut", emotion: "rumiación y pensamientos repetitivos", use: "Para quietud mental cuando los pensamientos giran sin parar.", questions: [
+    "¿Tu mente repite pensamientos una y otra vez?",
+    "¿Te cuesta dormir por rumiaciones?",
+    "¿Te enganchás en discusiones mentales sin fin?",
+  ], physical: "insomnio, cefaleas, tensión mental y física.", vibration: "Paz mental", effect: "Silencio interior"},
+  { name: "Wild Rose", emotion: "resignación apática", use: "Para recuperar interés y compromiso con la vida.", questions: [
+    "¿Te resignaste y 'te da igual'?",
+    "¿Hacés lo mínimo sin entusiasmo?",
+    "¿Aceptás situaciones insatisfactorias sin intentar cambiarlas?",
+  ], physical: "debilidad, falta de energía, baja motivación física.", vibration: "Interés en la vida", effect: "Alegría y motivación"},
+
+  // Grupo 4: Soledad
+  { name: "Heather", emotion: "auto-centrado y miedo a la soledad", use: "Para escuchar más y calmar la necesidad de hablar de uno mismo.", questions: [
+    "¿Necesitás hablar mucho de vos y te cuesta escuchar?",
+    "¿Buscás compañía porque la soledad te inquieta?",
+    "¿Sentís que tus problemas son urgentes y requieren atención inmediata?",
+  ], physical: "tensión digestiva, fatiga por sobrecarga emocional.", vibration: "Escucha y empatía", effect: "Conexión real"},
+  { name: "Impatiens", emotion: "impaciencia e irritabilidad", use: "Para tolerar ritmos ajenos y bajar revoluciones.", questions: [
+    "¿Te desespera la lentitud ajena?",
+    "¿Preferís hacer todo sola/o para ir más rápido?",
+    "¿Te irritás cuando algo te demora?",
+  ], physical: "contracturas, hipertensión leve, taquicardia, irritabilidad corporal.", vibration: "Ritmo natural", effect: "Calma"},
+  { name: "Water Violet", emotion: "orgullo y distancia emocional", use: "Para vincularse con calidez sin perder autonomía.", questions: [
+    "¿Preferís estar sola/o y mantener distancia emocional?",
+    "¿Te cuesta pedir ayuda o acercarte?",
+    "¿Otros te ven orgullosa/o o distante?",
+  ], physical: "mala circulación, tensión muscular, frío en extremidades.", vibration: "Humildad", effect: "Conexión serena"},
+
+  // Grupo 5: Hipersensibilidad a Influencias Externas
+  { name: "Agrimony", emotion: "malestar oculto tras apariencia alegre", use: "Para quienes ocultan su angustia tras una sonrisa y evitan el conflicto.", questions: [
+    "¿Solés mostrarte alegre para no preocupar a otros aunque por dentro estés mal?",
+    "¿Evitás el conflicto y decís 'está todo bien' aunque no lo esté?",
+    "¿Usás distracciones (comida, trabajo, series) para no sentir lo que duele?",
+  ], physical: "problemas digestivos, estrés intestinal, insomnio.", vibration: "Autenticidad", effect: "Expresión genuina"},
+  { name: "Centaury", emotion: "dificultad para decir no", use: "Para quienes ceden en exceso y permiten abusos por complacer.", questions: [
+    "¿Te cuesta decir que no y terminás aceptando más de lo que querés?",
+    "¿Ponés las necesidades de otros antes que las tuyas?",
+    "¿Sentís que abusan de tu buena voluntad?",
+  ], physical: "fatiga crónica, debilidad muscular, falta de vitalidad.", vibration: "Autoafirmación", effect: "Saber decir “no”"},
+  { name: "Holly", emotion: "celos, enojo, envidia", use: "Para abrir el corazón cuando hay hostilidad emocional.", questions: [
+    "¿Te aparecen celos, envidia o enojo con facilidad?",
+    "¿Te cuesta alegrarte por los logros ajenos?",
+    "¿Guardás resentimientos intensos?",
+  ], physical: "hipertensión, tensión cardíaca, rigidez muscular.", vibration: "Amor universal", effect: "Apertura afectiva"},
+  { name: "Walnut", emotion: "adaptación al cambio y protección", use: "Para sostener decisiones propias en etapas de cambio.", questions: [
+    "¿Estás en plena etapa de cambio o transición?",
+    "¿Te afectan mucho las influencias u opiniones ajenas?",
+    "¿Necesitás protección para sostener decisiones nuevas?",
+  ], physical: "alergias, digestión sensible, fatiga emocional reflejada físicamente.", vibration: "Adaptación", effect: "Seguridad en cambios"},
+
+  // Grupo 6: Desaliento o Desesperación
+  { name: "Crab Apple", emotion: "sensación de impureza u obsesión por detalles", use: "Para aceptar el propio cuerpo y soltar obsesión por limpieza/imperfección.", questions: [
+    "¿Te sentís 'impura/o' o incómoda/o con alguna parte de tu cuerpo?",
+    "¿Te obsesionás con limpieza, orden o detalles mínimos?",
+    "¿Te incomodan manchas, defectos o 'contaminación'?",
+  ], physical: "problemas de piel, alergias, digestión sensible.", vibration: "Purificación", effect: "Aceptación de sí mismo"},
+  { name: "Elm", emotion: "abruma por responsabilidades", use: "Para restaurar confianza cuando uno se siente temporalmente sobrepasado.", questions: [
+    "¿Te sentís abrumada/o por responsabilidades que normalmente manejás?",
+    "¿Te invade una duda puntual de estar a la altura?",
+    "¿Sos competente pero hoy te pesa la carga?",
+  ], physical: "fatiga, agotamiento físico, problemas musculares por tensión.", vibration: "Confianza en la capacidad", effect: "Seguridad y eficiencia"},
+  { name: "Larch", emotion: "falta de confianza", use: "Para animarse a intentar sin anticipar fracaso.", questions: [
+    "¿Te falta confianza para encarar desafíos?",
+    "¿Anticipás que vas a fallar y ni lo intentás?",
+    "¿Te comparás desfavorablemente con otros?",
+  ], physical: "tensión muscular, problemas posturales, falta de vitalidad.", vibration: "Autoestima", effect: "Valor en acción"},
+  { name: "Oak", emotion: "exceso de esfuerzo sin descanso", use: "Para quienes siguen de pie aun exhaustos y no se permiten parar.", questions: [
+    "¿Seguís adelante aun agotada/o y sin escuchar tu límite?",
+    "¿Te cuesta pedir ayuda y descansar?",
+    "¿Te definís por ser fuerte y persistente incluso enferma/o?",
+  ], physical: "agotamiento, fatiga crónica, tensión muscular y articular.", vibration: "Flexibilidad", effect: "Descanso interior"},
+  { name: "Pine", emotion: "culpa y auto-reproche", use: "Para liberar culpas excesivas y aceptar los propios límites.", questions: [
+    "¿Te sentís culpable incluso por cosas pequeñas?",
+    "¿Te castigás cuando te equivocás?",
+    "¿Te cuesta reconocer lo que hacés bien?",
+  ], physical: "opresión torácica, cefaleas tensionales, fatiga.", vibration: "Perdón interior", effect: "Autoaceptación"},
+  { name: "Star of Bethlehem", emotion: "shock y trauma", use: "Para consolar y reorganizar tras impactos emocionales.", questions: [
+    "¿Viviste un shock o pérdida que aún duele?",
+    "¿Te sentís 'entorpecida/o' por un trauma no elaborado?",
+    "¿Buscás consuelo y calma profunda?",
+  ], physical: "insomnio, tensión muscular, opresión torácica.", vibration: "Consuelo", effect: "Integración de la herida"},
+  { name: "Sweet Chestnut", emotion: "angustia extrema", use: "Para quien siente que llegó al límite y no ve salida.", questions: [
+    "¿Sentís angustia extrema, como en un callejón sin salida?",
+    "¿Experimentás una 'noche oscura del alma'?",
+    "¿Te sentís al borde de tus fuerzas emocionales?",
+  ], physical: "agotamiento físico, colapso, debilidad general.", vibration: "Luz en la oscuridad", effect: "Esperanza"},
+  { name: "Willow", emotion: "resentimiento y victimismo", use: "Para soltar la amargura y retomar responsabilidad personal.", questions: [
+    "¿Sentís resentimiento o amargura por lo que te pasó?",
+    "¿Te ubicás como víctima de las circunstancias?",
+    "¿Te cuesta perdonar y salir del enojo?",
+  ], physical: "dolor crónico, rigidez, problemas digestivos por tensión emocional.", vibration: "Aceptación", effect: "Responsabilidad personal"},
+
+  // Grupo 7: Preocupación Excesiva por los Demás
+  { name: "Beech", emotion: "intolerancia y crítica", use: "Para tolerancia y empatía cuando la crítica y la irritación predominan.", questions: [
+    "¿Te cuesta tolerar defectos ajenos y criticás con facilidad?",
+    "¿Te irritan los errores 'obvios' de los demás?",
+    "¿Te resulta difícil empatizar cuando alguien piensa distinto?",
+  ], physical: "cefaleas tensionales, contracturas cervicales y dorsales.", vibration: "Comprensión", effect: "Tolerancia"},
+  { name: "Chicory", emotion: "posesividad y apego", use: "Para amor sin manipulación ni reclamos de atención.", questions: [
+    "¿Te volvés posesiva/o con seres queridos y te cuesta soltar?",
+    "¿Buscás atención o agradecimiento y te duele cuando no llega?",
+    "¿Usás el sacrificio como forma de reclamar amor?",
+  ], physical: "tensión torácica, dolor de cabeza, problemas digestivos por estrés.", vibration: "Amor desinteresado", effect: "Generosidad"},
+  { name: "Rock Water", emotion: "rigidez y autoexigencia extrema", use: "Para flexibilizar ideales rígidos y permitirse disfrutar.", questions: [
+    "¿Sos muy rígida/o con vos y tus ideales?",
+    "¿Te cuesta permitirte placer o flexibilidad?",
+    "¿Buscás ser 'perfecto/a' y te exigís demasiado?",
+  ], physical: "contracturas, rigidez articular, problemas posturales.", vibration: "Flexibilidad", effect: "Disfrute de la vida"},
+  { name: "Vervain", emotion: "exceso de tensión y entusiasmo", use: "Para moderar el exceso de impulso, fanatismo o tensión.", questions: [
+    "¿Te pasás de revoluciones por entusiasmo o ideales?",
+    "¿Te cuesta relajarte y delegar?",
+    "¿Sos propensa/o a tensiones musculares por exceso de impulso?",
+  ], physical: "hipertensión leve, contracturas, tensión nerviosa.", vibration: "Moderación", effect: "Serenidad y calma"},
+  { name: "Vine", emotion: "autoritarismo y dureza", use: "Para liderar con firmeza y respeto sin imposición.", questions: [
+    "¿Tendés a imponer tu voluntad?",
+    "¿Sos directiva/o y poco flexible?",
+    "¿Te cuesta escuchar otras posturas?",
+  ], physical: "rigidez postural, tensión cervical, dolor muscular.", vibration: "Liderazgo positivo", effect: "Humildad y guía justa"},
+  
+  // Rescue Remedy (al final, como en el original)
+  { name: "Rescue Remedy", emotion: "crisis y urgencias emocionales", use: "Para crisis, shock, pánico o estrés intenso (apoyo inmediato).", questions: [
+    "¿Estás atravesando un momento de crisis o shock?",
+    "¿Te cuesta recuperar la calma después de un impacto emocional?",
+    "¿Necesitás una ayuda inmediata para serenarte?",
+  ], physical: "estabiliza el sistema nervioso autónomo, regula respiración, frecuencia cardíaca y tensión aguda; ayuda a calmar temblores o espasmos relacionados con la crisis.", vibration: "Calma y serenidad", effect: "Estabilización emocional"},
+];
+
+const TOTAL_PREGUNTAS = flowers.length * 3;
+
+function el(id){ return document.getElementById(id); }
+
+function renderForm(){
+  const cont = el('form');
+  cont.innerHTML = '';
+  
+  const groups = {
+    'Miedo': ['Aspen', 'Cherry Plum', 'Mimulus', 'Red Chestnut', 'Rock Rose'],
+    'Incertidumbre': ['Cerato', 'Gentian', 'Gorse', 'Hornbeam', 'Scleranthus', 'Wild Oat'],
+    'Falta de Interés en el Presente': ['Clematis', 'Honeysuckle', 'Mustard', 'Olive', 'White Chestnut', 'Wild Rose'],
+    'Soledad': ['Heather', 'Impatiens', 'Water Violet'],
+    'Hipersensibilidad a Influencias y Opiniones': ['Agrimony', 'Centaury', 'Holly', 'Walnut'],
+    'Desaliento o Desesperación': ['Crab Apple', 'Elm', 'Larch', 'Oak', 'Pine', 'Star of Bethlehem', 'Sweet Chestnut', 'Willow'],
+    'Preocupación Excesiva por los Demás': ['Beech', 'Chicory', 'Rock Water', 'Vervain', 'Vine'],
+    'Ayuda de Emergencia': ['Rescue Remedy']
+  };
+
+  for (const groupName in groups) {
+    const groupTitle = document.createElement('h2');
+    groupTitle.className = 'section-title';
+    groupTitle.textContent = groupName;
+    cont.appendChild(groupTitle);
+    
+    groups[groupName].forEach(flowerName => {
+      const f = flowers.find(fl => fl.name === flowerName);
+      if (f) {
+        const i = flowers.indexOf(f);
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `<h3>${f.name}</h3><div class="desc">${f.use}</div>`;
+        f.questions.forEach((q, j) => {
+          const qid = `f${i}q${j}`;
+          const row = document.createElement('div');
+          row.className = 'q';
+          row.innerHTML = `
+            <label for="${qid}">${q}</label><br/>
+            <div class="options">
+              <label><input type="radio" name="${qid}" value="yes"> Sí</label>
+              <label><input type="radio" name="${qid}" value="no"> No</label>
+            </div>
+          `;
+          card.appendChild(row);
+        });
+        cont.appendChild(card);
+      }
+    });
+  }
+
+  cont.addEventListener('change', actualizarProgreso);
+  actualizarProgreso();
+}
+
+function leerRespuestas(){
+  const scores = flowers.map((f, i) => {
+    let yes = 0; let answered = 0;
+    for (let j=0;j<3;j++){
+      const sel = document.querySelector(`input[name="f${i}q${j}"]:checked`);
+      if(sel){ answered++; if(sel.value === 'yes') yes++; }
+    }
+    return { name: f.name, use: f.use, emotion: f.emotion, score: yes, physical: f.physical, vibration: f.vibration, effect: f.effect };
+  });
+  return scores;
+}
+
+function actualizarProgreso(){
+  const checked = document.querySelectorAll('#form input[type="radio"]:checked').length;
+  const names = new Set();
+  document.querySelectorAll('#form input[type="radio"]:checked').forEach(inp => names.add(inp.name));
+  el('progreso').textContent = `${names.size}/${TOTAL_PREGUNTAS} respondidas`;
+}
+
+function verResultados(){
+  const scores = leerRespuestas();
+  const ordered = [...scores].sort((a,b)=> b.score - a.score || a.name.localeCompare(b.name));
+
+  const g3 = ordered.filter(x=>x.score === 3);
+  const g2 = ordered.filter(x=>x.score === 2);
+  const g1 = ordered.filter(x=>x.score === 1);
+
+  const seleccion = [...g3, ...g2, ...g1].slice(0, 9);
+
+  // Fórmula probable
+  let htmlFormula = `<h3>Fórmula probable (máx. 9 flores)</h3>`;
+  if(seleccion.length === 0){
+    htmlFormula += `<p class="muted">No hay indicios suficientes por ahora.</p>`;
+  } else {
+    htmlFormula += `<ul class="list">` + seleccion.map(s=> `<li><strong>${s.name}</strong> — ${s.use} <span class="muted">(${s.score}/3)</span></li>`).join('') + `</ul>`;
+  }
+  el('bloqueFormula').innerHTML = htmlFormula;
+
+  // Grupos por puntaje
+  let htmlGrupos = '';
+  const mk = (titulo, arr)=> arr.length? `<p><strong>${titulo}:</strong> ${arr.map(x=>x.name).join(', ')}</p>` : '';
+  htmlGrupos += mk('Priorizar (3/3)', g3);
+  htmlGrupos += mk('Considerar (2/3)', g2);
+  htmlGrupos += mk('Opcionales (1/3)', g1);
+  el('bloqueGrupos').innerHTML = `<h3>Combinaciones sugeridas</h3>${htmlGrupos || '<p class="muted">Sin combinaciones por ahora.</p>'}`;
+
+  // Diagnóstico probable (basado en >=2/3 de la selección)
+  const altos = seleccion.filter(s=> s.score >= 2);
+  let diag = '';
+  let fisicos = '';
+
+  if(altos.length){
+    diag = `<p>Patrones emocionales destacados:</p><ul class="list">` + altos.map(s=> `<li><strong>${s.name}:</strong> ${s.emotion}</li>`).join('') + `</ul>`;
+  } else if (seleccion.length){
+    diag = `<p class="muted">Se observan tendencias leves: ${seleccion.map(s=> s.emotion).join(', ')}.</p>`;
+  } else {
+    diag = `<p class="muted">Aún no hay señales claras. Podés completar más preguntas.</p>`;
+  }
+
+  // Posibles reflejos físicos (para el terapeuta)
+  const fisicosSeleccionados = seleccion.filter(f => f.physical);
+  if (fisicosSeleccionados.length > 0) {
+      fisicos = `
+        <h4 style="margin-top: 24px;">✨ Posibles reflejos físicos:</h4>
+        <p>Estas son las posibles repercusiones físicas de las emociones identificadas:</p>
+        <ul class="list">
+          ${fisicosSeleccionados.map(f => `<li><strong>${f.name}:</strong> ${f.physical}</li>`).join('')}
+        </ul>
+      `;
+  }
+
+  el('bloqueDiagnostico').innerHTML = `<h3>Diagnóstico probable</h3>${diag}${fisicos}`;
+
+  // Rescue: recomendado si >= 2/3
+  const rescue = scores.find(s=> s.name === 'Rescue Remedy');
+  if(rescue){
+    const txt = rescue.score >= 2 ?
+      `✔ <strong>Rescue Remedy</strong> recomendado (apoyo inmediato en crisis). Puntaje: ${rescue.score}/3.` :
+      `○ <strong>Rescue Remedy</strong> no prioritario en este momento. Puntaje: ${rescue.score}/3.`;
+    el('bloqueRescue').innerHTML = `<h3>Rescue Remedy</h3><p>${txt}</p>`;
+  }
+
+  // Ranking completo
+  const full = ordered.map(s=> `<li><span class="mono">${s.score}/3</span> — <strong>${s.name}</strong> · ${s.use}</li>`).join('');
+  el('bloqueRanking').innerHTML = `<ol class="list">${full}</ol>`;
+  
+  generarInstrucciones(seleccion);
+
+  el('resultados').hidden = false;
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+function generarInstrucciones(seleccion) {
+    const nombreCompleto = el('nombre').value;
+    const nombreDePila = nombreCompleto.split(' ')[0] || 'Hola';
+    const fechaEncuentro = el('fecha').value;
+
+    let textoEmociones = '';
+    
+    if (seleccion.length > 0) {
+        const frases = seleccion.map(f => `ayudarte a encontrar la **${f.effect}** y a recobrar la vibración de la **${f.vibration}**`);
+        const ultimaFrase = frases.pop();
+        if (frases.length > 0) {
+          textoEmociones = `A partir de lo que exploramos, la fórmula ha sido creada para ${frases.join(', ')} y, finalmente, ${ultimaFrase}.`
+        } else {
+          textoEmociones = `A partir de lo que exploramos, la fórmula ha sido creada para ${ultimaFrase}.`
+        }
+    } else {
+        textoEmociones = `Te cuento que en el cuestionario no se encontraron indicios de emociones en desequilibrio, lo que es una excelente señal. Si aún así querés comenzar la terapia floral, podemos trabajar en potenciar alguna cualidad que te interese.`
+    }
+
+    let fechaFinalFormatted = 'la fecha de tu próxima entrevista';
+    if (fechaEncuentro) {
+        const fechaActual = new Date(fechaEncuentro + 'T12:00:00'); // Añadir T12:00:00 para evitar problemas de zona horaria
+        fechaActual.setDate(fechaActual.getDate() + 21);
+        fechaFinalFormatted = fechaActual.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    }
+    
+
+    let textoCompleto = `
+Hola ${nombreDePila}!
+
+Espero que este mensaje te encuentre bien.
+
+Me gustaría compartir con vos algunas indicaciones para tu tratamiento de terapia floral de Yoga & Mindfulness Velefer. Te recuerdo que esta es una herramienta complementaria para ayudarte a reconectar con vos.
+
+Aclaración importante: Este tratamiento es un apoyo para tu bienestar emocional y no reemplaza de ninguna manera la consulta o el tratamiento médico.
+
+${textoEmociones}
+
+Esta fórmula ha sido creada para acompañarte en tu proceso y ayudarte a equilibrar tus emociones, brindándote armonía y bienestar.
+
+### 💧 Cómo tomar tus gotitas: el protocolo de impregnación
+
+Día 1: Primera hora
+Tomá **4 gotas cada 10 minutos** durante una hora (6 tomas en una hora).
+Luego, antes de ir a dormir, tomá **15 gotas** más.
+
+Día 2: Al despertar y durante el día
+Tomá **15 gotas** al despertar.
+A lo largo del día, colocá **24 gotas** en una botella de agua con 600 ml y tomala durante todo el día.
+
+Día 3 en adelante: Toma regular
+A partir de aquí, el proceso se vuelve más simple. Tomá **4 gotas, 6 veces al día**, hasta terminar el frasco.
+Tu tratamiento durará aproximadamente hasta el **${fechaFinalFormatted}** o hasta que el frasco se acabe, momento en que tendremos una nueva entrevista para que me cuentes cómo te sentís y ver si es necesario hacer una reformulación de ajuste.
+
+### 💖 Consejos importantes para tu proceso:
+
+* **Sin contacto:** Las gotas se colocan debajo de la lengua, tratando de no tocar la pipeta con la boca para no contaminar la fórmula. Dejá reposar las gotitas debajo de la lengua por 2 minutos aproximadamente.
+* **Momentos clave:** Consumí las gotas 20 minutos antes o después de las comidas, de lavarte los dientes o de tomar cualquier otro medicamento.
+* **Energía:** Llevá el frasco cerca de tu cuerpo para que las esencias se impregnen de tu energía y sean más eficaces. Recordá mantener el frasco lejos de ambientes muy calientes.
+* **Recambio:** Cuando veas que a tu frasco le queda aproximadamente un cuarto del contenido, por favor avisame para que podamos preparar el siguiente.
+
+### ¿Quiénes pueden recibir la terapia floral de Bach?
+
+Las Flores de Bach son aptas para todas las personas, independientemente de su edad o estado de salud. Al tratarse de una terapia complementaria, sin efectos secundarios ni contraindicaciones, pueden ser utilizadas por bebés, niños, adultos, personas mayores y mujeres embarazadas. Su propósito es actuar sobre el estado emocional de la persona, armonizándolo y facilitando su bienestar.
+
+Un abrazo grande,
+Vero - Yoga & Mindfulness Velefer
+`;
+    
+    const instruccionesHTML = `
+      <div class="patient-instructions">
+        <h3>Instrucciones para el paciente</h3>
+        <p>A continuación, podés copiar y enviar este mensaje personalizado a tu paciente:</p>
+        <div id="instruccionesTexto" style="white-space: pre-wrap;">${textoCompleto.trim()}</div>
+        <div style="text-align: right; margin-top: 12px;">
+          <button class="btn primary" id="btnCopiar">Copiar instrucciones</button>
+        </div>
+      </div>
+    `;
+
+    el('bloqueInstrucciones').innerHTML = instruccionesHTML;
+
+    el('btnCopiar').addEventListener('click', () => {
+        const texto = el('instruccionesTexto').textContent;
+        navigator.clipboard.writeText(texto.trim()).then(() => {
+            alert('¡Instrucciones copiadas al portapapeles!');
+        }).catch(err => {
+            console.error('Error al copiar el texto: ', err);
+            alert('No se pudo copiar el texto. Por favor, copialo manualmente.');
+        });
+    });
+}
+
+
+function reiniciar(){
+  document.querySelectorAll('#form input[type="radio"]').forEach(i=> i.checked = false);
+  document.querySelectorAll('.patient-info input, .patient-info textarea').forEach(i => i.value = '');
+  el('resultados').hidden = true;
+  actualizarProgreso();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function guardarComoPDF() {
+    const patientInfo = el('patient-info');
+    const fields = patientInfo.querySelectorAll('.field');
+    const originalInputs = [];
+
+    fields.forEach(field => {
+        const input = field.querySelector('input, textarea');
+        if (input) {
+            const label = field.querySelector('label');
+            const newSpan = document.createElement('span');
+            newSpan.textContent = input.value || 'No especificado';
+            newSpan.style.display = 'block';
+            newSpan.style.marginTop = '4px';
+
+            originalInputs.push({ field: field, input: input });
+            input.replaceWith(newSpan);
+        }
+    });
+
+    const questionElements = document.querySelectorAll('#form .q');
+    questionElements.forEach(q => {
+      const inputName = q.querySelector('input[type="radio"]').name;
+      const answer = document.querySelector(`input[name="${inputName}"]:checked`);
+      if (answer) {
+        q.setAttribute('data-answer', answer.value === 'yes' ? 'Sí' : 'No');
+      }
+    });
+
+    window.print();
+
+    window.addEventListener('afterprint', () => {
+        originalInputs.forEach(item => {
+            const span = item.field.querySelector('span:not(label)');
+            if (span) {
+                span.replaceWith(item.input);
+            }
+        });
+        questionElements.forEach(q => q.removeAttribute('data-answer'));
+    }, { once: true });
+}
+
+
+// Eventos
+el('btnVer').addEventListener('click', verResultados);
+el('btnReiniciar').addEventListener('click', reiniciar);
+el('btnGuardar').addEventListener('click', guardarComoPDF);
+
+// Render inicial
+renderForm();
+</script>
+</body>
+</html>
